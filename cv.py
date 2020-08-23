@@ -1,3 +1,12 @@
+import cv2 as cv
+import numpy as np
+from google.colab.patches import cv2_imshow  
+from math import sin, cos, radians
+from google.colab import files
+import os
+import subprocess
+
+
 class Canvas_cv:
   @staticmethod
   def get_color_rgb(r, g, b):
@@ -10,19 +19,22 @@ class Canvas_cv:
   COLORS = {'red':(0,0,255), 'white':(255,255,255), 'black':(0,0,0),
           'blue':(255,0,0),  'grey':(127,127,127), 'green': (0,255,0),
           'yellow': (0,255,255), 'orange': (0,165,255), 'indigo': (130,0,75),
-          'violet': (238,130,238)}
+          'violet': (238,130,238), 'vanilla custard':(185,225,240), 'goldfinch':(116,219,243),
+          'scarlet sage':(119, 113, 185), 'light orange':(244,246,249), 'gold':(0,215,255)}
 
-  def __init__(self, width=480, height=480, startx=None, starty=None, scale01=0.97):
-    import cv2 as cv
+  def __init__(self, width=480, height=480, startx=None, starty=None, scale01=0.97,
+               color=COLORS['scarlet sage'],
+               background_color=COLORS['light orange']):
     self.startx = startx;  self.starty = starty
     self.width = width;  self.height= height
+    self.background_color = background_color
     self.size01 = min(width, height)/2.0 * scale01
     self.center_x = self.width/2 - 1;  self.center_y = self.height/2 - 1
-    self.color = (255, 255, 255)
+    self.color = color
     self.thickness = 1
     self.line_type = cv.LINE_AA
     self.reset_position()
-    self.image = self.clear()
+    self.image = np.zeros((self.height,self.width,3), np.uint8); self.clear()
 
   def reset_position(self):
     self.x = self.center_x
@@ -45,30 +57,31 @@ class Canvas_cv:
     return self.__set_position_from_xy(p[0], p[1])
 
   def clear(self):
-    import numpy as np
-    self.image = np.zeros((self.height,self.width,3), np.uint8)
+    self.image[:,:,:] = self.background_color
     self.reset_position()
     return self.image  
 
   def show(self):
-    from google.colab.patches import cv2_imshow  
     cv2_imshow(self.image)
 
   def set_color_rgb(self, r, g, b):
     self.color = (b, g, r)
     return self.color
 
-  def get_color(self, color_name):
-    if color_name is None:
+  def get_color(self, color_name_or_rgb): 
+    color = color_name_or_rgb
+    if color is None:
       return self.color
+    if isinstance(color, (list, tuple)):
+      return (color[2], color[1], color[0])  
     try:
-      return Canvas_cv.COLORS[color_name]
+      return Canvas_cv.COLORS[color]
     except:
-      print(color_name, " is not known")
+      print("color '", color, "' is not known")
       return self.color
 
-  def set_color(self, color_name):
-    self.color = self.get_color(color_name)
+  def set_color(self, color_name_or_rgb):
+    self.color = self.get_color(color_name_or_rgb)
     return self.color
 
   def set_thickness(self, thickness):
@@ -81,8 +94,8 @@ class Canvas_cv:
     return self.thickness
 
   def draw_line(self, point1, point2, color=None, thickness=None):
-    import cv2 as cv
     self.set_color(color)
+    old_thickness = self.thickness
     self.set_thickness(thickness)
     point1_ok = self.get_xy_from_point(point1)
     point2_ok = self.get_xy_from_point(point2)
@@ -90,6 +103,7 @@ class Canvas_cv:
     p2 = self.__point_cv(point2_ok)
     cv.line(self.image, p1, p2, self.color, self.thickness, lineType=self.line_type)
     self.set_position_from_point(point2_ok)
+    if self.thickness == -1: self.thickness = old_thickness
 
   def draw_line_to(self, point, thickness=None):
     self.draw_line((self.x, self.y), point, thickness=thickness)
@@ -101,14 +115,15 @@ class Canvas_cv:
     self.draw_line( self.get_point_from_point01(point01_from), self.get_point_from_point01(point01_to) )
 
   def draw_circle(self, radius, center=None, color=None, thickness=None): # thickness=-1 to fill the circle
-    import cv2 as cv
     self.set_color(color)
+    old_thickness = self.thickness
     self.set_thickness(thickness)
     radius_int = Canvas_cv.int(radius)
     center_ok = self.get_xy_from_point(center)
     point_cv = self.__point_cv(center_ok)
     cv.circle(self.image, point_cv, Canvas_cv.int(radius), self.color, self.thickness, lineType=self.line_type)
     self.set_position_from_point(center_ok)
+    if self.thickness == -1: self.thickness = old_thickness
 
   def draw_circle01(self, radius01, center01=None, color=None, thickness=None): # thickness=-1 to fill the circle
     radius = radius01 * self.size01
@@ -116,15 +131,12 @@ class Canvas_cv:
     self.draw_circle(radius, center=center, color=color, thickness=thickness)
 
   def get_cirle_point01(self, angle_degrees, radius=1, center01=None):
-    from math import sin, cos, radians
     x, y = (0, 0) if center01 is None else center01
     x = 0  if x is None else x
     y = 0  if y is None else y
     return ( x + radius * cos(radians(angle_degrees)), y + radius * sin(radians(angle_degrees)))
 
   def download(self, file_name=None, is_jpg=False):
-    import cv2 as cv
-    from google.colab import files
     extension = '.jpg' if is_jpg else '.png'
     path = 'image' if file_name is None else file_name
     full_path = path + extension
@@ -180,7 +192,7 @@ class Video_cv:
     self.frames_count = 0  
     if frame is None:
       self.width = width; self.height= height
-      self.frame = self.get_black_frame()
+      self.frame = np.zeros((self.height,self.width,3), np.uint8) 
     else:
       self.frame = frame
       self.height, self.width, _ = self.__get_image(frame).shape
@@ -190,19 +202,12 @@ class Video_cv:
       return self.get_black_frame()
     if isinstance(frame, Canvas_cv):
         return frame.image
-    return frame    
-
-  def get_black_frame(self):
-    import numpy as np
-    return np.zeros((self.height,self.width,3), np.uint8)  
+    return frame     
 
   def show_frame(self, frame=None):
-    from google.colab.patches import cv2_imshow  #  to show an image in google Colab
     cv2_imshow(self.__get_image( self.frame if frame is None else frame ))
 
   def __init_video(self):
-    import cv2 as cv
-    import os
     video_size = (self.width, self.height) 
     video_avi = self.name + '.avi'
     if os.path.exists(video_avi): os.remove(video_avi)  
@@ -242,8 +247,6 @@ class Video_cv:
     files.download(file_path) 
 
   def end_video(self, download=False, show=True):
-    import os
-    import subprocess
     self.video_writer.release()  
     self.frames_count = 0  
     result = subprocess.call(['ffmpeg', '-y', '-i', self.name+'.avi', self.name+'.mp4'])
@@ -251,3 +254,4 @@ class Video_cv:
       self.download()
     if show:
       return self.show()
+
