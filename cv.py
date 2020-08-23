@@ -186,6 +186,11 @@ class Canvas_cv:
     y_int = self.height - self.int(y)
     return ( x_int, y_int )
 
+  def math_sine(angle_degrees):
+    return sin(radians(angle_degrees))
+
+  def math_cosine(angle_degrees):
+    return cos(radians(angle_degrees))  
 
 ###############################################
 class Video_cv:
