@@ -6,6 +6,8 @@ from google.colab import files
 import os
 import subprocess
 
+SOLID_THICKNESS = -1
+
 
 class Canvas_cv:
   @staticmethod
@@ -105,14 +107,14 @@ class Canvas_cv:
     self.set_position_from_point(point2_ok)
     if self.thickness == -1: self.thickness = old_thickness
 
-  def draw_line_to(self, point, thickness=None):
-    self.draw_line((self.x, self.y), point, thickness=thickness)
+  def draw_line_to(self, point, color=None, thickness=None):
+    self.draw_line((self.x, self.y), point, color=color, thickness=thickness)
 
-  def draw_line_to01(self, point01):
-    self.draw_line01(self.__get_point01_from_point(), point01)
+  def draw_line_to01(self, point01, color=None, thickness=None):
+    self.draw_line01(self.__get_point01_from_point(), point01, color=color, thickness=thickness)
 
-  def draw_line01(self, point01_from, point01_to):
-    self.draw_line( self.get_point_from_point01(point01_from), self.get_point_from_point01(point01_to) )
+  def draw_line01(self, point01_from, point01_to, color=None, thickness=None):
+    self.draw_line( self.get_point_from_point01(point01_from), self.get_point_from_point01(point01_to) , color=color, thickness=thickness)
 
   def draw_circle(self, radius, center=None, color=None, thickness=None): # thickness=-1 to fill the circle
     self.set_color(color)
@@ -215,8 +217,8 @@ class Video_cv:
                          cv.VideoWriter_fourcc(*"XVID"), 
                          self.fps, video_size) 
 
-  def write_frame(self, frame):
-    image = self.__get_image(frame)
+  def write_frame(self, frame=None):
+    image = self.__get_image(self.frame) if frame is None else self.__get_image(frame)
     frame_height, frame_width, _ = image.shape
     if frame_height != self.height or frame_width != self.width:
       print("Error frame size ", frame_width, "x", frame_height, "different than expected ", self.width, "x", self.height)
@@ -254,4 +256,5 @@ class Video_cv:
       self.download()
     if show:
       return self.show()
+
 
