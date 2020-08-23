@@ -16,6 +16,14 @@ class Canvas_cv:
   @staticmethod
   def int(n):
     return int(round(n,0))
+  
+  @staticmethod
+  def math_sine(angle_degrees):
+    return sin(radians(angle_degrees))
+
+  @staticmethod
+  def math_cosine(angle_degrees):
+    return cos(radians(angle_degrees))  
 
   @property
   def SOLID(self):  return -1 # for thickness 
@@ -186,11 +194,7 @@ class Canvas_cv:
     y_int = self.height - self.int(y)
     return ( x_int, y_int )
 
-  def math_sine(angle_degrees):
-    return sin(radians(angle_degrees))
 
-  def math_cosine(angle_degrees):
-    return cos(radians(angle_degrees))  
 
 ###############################################
 class Video_cv:
