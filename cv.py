@@ -5,8 +5,7 @@ from math import sin, cos, radians
 from google.colab import files
 import os
 import subprocess
-
-SOLID_THICKNESS = -1
+from collections import namedtuple
 
 
 class Canvas_cv:
@@ -17,6 +16,9 @@ class Canvas_cv:
   @staticmethod
   def int(n):
     return int(round(n,0))
+
+  @property
+  def SOLID(self):  return -1 # for thickness 
 
   COLORS = {'red':(0,0,255), 'white':(255,255,255), 'black':(0,0,0),
           'blue':(255,0,0),  'grey':(127,127,127), 'green': (0,255,0),
@@ -256,5 +258,4 @@ class Video_cv:
       self.download()
     if show:
       return self.show()
-
 
