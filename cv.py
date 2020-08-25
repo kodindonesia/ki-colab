@@ -25,6 +25,16 @@ class Canvas_cv:
   def math_cosine(angle_degrees):
     return cos(radians(angle_degrees))  
 
+  @staticmethod
+  def transform_point_around_pivot(point, angle, pivot=(0,0), scale=1):
+    x, y = point
+    px, py = pivot
+    c = cos(radians(angle));  s = sin(radians(angle))
+    dx = (x-px) * scale;  dy = (y-py) * scale
+    nx = (c * dx) - (s * dy)  + px
+    ny = (s * dx) + (c * dy)  + py
+    return (nx, ny)  
+  
   @property
   def SOLID(self):  return -1 # for thickness 
 
