@@ -48,8 +48,8 @@ class Canvas_cv:
                color='scarlet sage', background_color='light orange'):
     self.startx = startx;  self.starty = starty
     self.width = width;  self.height= height
-    self.background_color = COLORS['light orange']; self.background_color = self.get_color(background_color)
-    self.color = COLORS['scarlet sage'];  self.color = self.get_color(color)
+    self.background_color = Canvas_cv.COLORS['light orange']; self.background_color = self.get_color(background_color)
+    self.color = Canvas_cv.COLORS['scarlet sage'];  self.color = self.get_color(color)
     self.size01 = min(width, height)/2.0 * scale01
     self.center_x = self.width/2 - 1;  self.center_y = self.height/2 - 1
     self.thickness = 1
