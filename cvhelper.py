@@ -45,14 +45,13 @@ class Canvas_cv:
           'scarlet sage':(119, 113, 185), 'light orange':(244,246,249), 'gold':(0,215,255)}
 
   def __init__(self, width=480, height=480, startx=None, starty=None, scale01=0.97,
-               color=COLORS['scarlet sage'],
-               background_color=COLORS['light orange']):
+               color='scarlet sage', background_color='light orange'):
     self.startx = startx;  self.starty = starty
     self.width = width;  self.height= height
-    self.background_color = background_color
+    self.background_color = COLORS['light orange']; self.background_color = self.get_color(background_color)
+    self.color = COLORS['scarlet sage'];  self.color = self.get_color(color)
     self.size01 = min(width, height)/2.0 * scale01
     self.center_x = self.width/2 - 1;  self.center_y = self.height/2 - 1
-    self.color = color
     self.thickness = 1
     self.line_type = cv.LINE_AA
     self.reset_position()
