@@ -200,7 +200,7 @@ class Canvas_cv:
   def __point_cv(self, point):
     x, y = self.get_xy_from_point(point)
     x_int = self.int(x)
-    y_int = self.height - self.int(y)
+    y_int = self.height-1 - self.int(y)
     return ( x_int, y_int )
 
 
