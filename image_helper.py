@@ -55,20 +55,29 @@ class Image_Super_Resolution: # does not need the GPU
     else: # I assume that it is a np array
       return image
 
+  def super_upscale_PIL_image_by_4x(self, image):
+    img_array = self.__get_array_image(image)
+    return PIL_Image.fromarray( self.model.predict(img_array) )
+
+  def super_upscale_numpyimage_by_4x(self, image):
+    img_array = self.__get_array_image(image)
+    return self.model.predict(img_array) 
+
+  def super_upscale_cvimage_by_4x(self, image):
+    return self.super_upscale_numpyimage_by_4x(image)      
+
   def simple_upscale_PIL_image(self, image, multiplier=4):
     m = int(multiplier)
     if multiplier != m:
       print("simple_upscale_PIL_image: multiplier must be an integer! using ", m)
     pimg = self.__get_PIL_image(image)  
-    return pimg.resize(size=(pimg.size[0]*m, pimg.size[1]*m), resample=PIL_Image.LANCZOS) #BICUBIC
+    return pimg.resize(size=(pimg.size[0]*m, pimg.size[1]*m), resample=PIL_Image.LANCZOS) 
 
-  def super_upscale_PIL_image_by_4x(self, image):
-    img_array = self.__get_array_image(image)
-    return PIL_Image.fromarray( self.model.predict(img_array) )
-
-  def super_upscale_cv_image_by_4x(self, image):
-    img_array = self.__get_array_image(image)
-    return self.model.predict(img_array)
+  def simple_upscale_cvimage_image(self, image, multiplier=4):
+    width = int(image.shape[1] * multiplier)
+    height = int(image.shape[0] * multiplier)
+    dim = (width, height)
+    return cv.resize(image, dim, interpolation = cv.INTER_LANCZOS4)   
 
 
 ############################################################
@@ -98,7 +107,11 @@ class Image_Noise_Cancel: # does not need the GPU
     return PIL_Image.fromarray( self.model.predict(img_array) )
 
   # open_CV
-  def clean_cv_image_and_scale_by_2x(self, image):
+
+  def clean__numpyimage_and_scale_by_2x(self, image):
     img_array = self.__get_array_image(image)
     return self.model.predict(img_array)
+
+  def clean_cvimage_and_scale_by_2x(self, image):
+    return self.clean__numpyimage_and_scale_by_2x(image)
 
