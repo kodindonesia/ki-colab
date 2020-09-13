@@ -22,6 +22,9 @@ class Pil_image:
   def get(image_address):
     return PIL_Image.open(image_address, 'r')
 
+  def write(pil_image, file_path):
+    pil_image.save(file_path)  
+
   def show(pil_image):
     a = np.uint8(pil_image)
     f = io.BytesIO()
@@ -41,6 +44,9 @@ class Cv_image:
     elif no_alpha:
       flag = cv.IMREAD_COLOR
     return cv.imread(image_address, flag) # row (height) x column (width) x color (3). The order of color is BGR (blue, green, red).
+
+  def write(cv_image, file_path):
+    cv.imwrite(file_path, cv_image) 
 
   def show(cv_image):
     cv2_imshow(cv_image)
